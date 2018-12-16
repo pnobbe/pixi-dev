@@ -1,0 +1,28 @@
+{
+	"compileOnSave": true,
+	"compilerOptions": {
+		"baseUrl": "./src/",
+		"outDir": "./dist/tsc",
+		"declaration": false,
+		"module": "es6",
+		"moduleResolution": "node",
+		"target": "es5",
+		"allowJs": true,
+		"sourceMap": true,
+		"paths": {
+			"@assets/*": ["assets/*"]
+		},
+		"typeRoots": [
+			"node_modules/@types"
+		],
+		"lib": [
+			"es2017",
+			"dom",
+			"esnext"
+		]
+	},
+
+	"include": [
+		"./src/"
+	]
+}

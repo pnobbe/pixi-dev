@@ -1,8 +1,11 @@
 import * as PIXI from 'pixi.js';
-import Viewport from 'pixi-viewport';
+import * as Viewport from 'pixi-viewport';
 import 'pixi-layers';
-import './tilemap/index';
+import './tiled';
 import Debug from './debug';
+import {TiledMapLoader, TileMap} from "./tiled";
+import './css/index.css';
+
 // import { GridLayer, MapLayer, TokenLayer, GMLayer } from './layers';
 
 const debug = true;
@@ -10,7 +13,7 @@ const debug = true;
 const SCREEN_WIDTH = window.innerWidth;
 const SCREEN_HEIGHT = window.innerHeight;
 
-let app = new PIXI.Application(SCREEN_WIDTH, SCREEN_HEIGHT, { backgroundColor: 0x34034 });
+let app = new PIXI.Application(SCREEN_WIDTH, SCREEN_HEIGHT, {backgroundColor: 0x34034});
 document.body.appendChild(app.view);
 
 // Create layers
@@ -18,18 +21,16 @@ const mapLayer = new PIXI.display.Group(0, true);
 const debugLayer = new PIXI.display.Group(1, true);
 
 // Create pixi-display stage
-app.stage = new PIXI.display.Stage();
-app.stage.group.enableSort = true;
 
-
+const displayStage = new PIXI.display.Stage();
+displayStage.group.enableSort = true;
+app.stage = displayStage;
 
 // Resize renderer together with window
 window.addEventListener('resize', () => {
 	app.renderer.resize(window.innerWidth, window.innerHeight);
 });
 
-const map = 'island.tmx';
-const loader = PIXI.loader;
 
 app.stage.addChild(new PIXI.display.Layer(mapLayer));
 const debugr = new Debug();
@@ -40,39 +41,51 @@ if (debug) {
 	app.stage.addChild(debugr);
 }
 
-const text = new PIXI.Text("", { font: '16px SegoeUI' });
+const text = new PIXI.Text("", {fontSize: 16, fontFamily: 'SegoeUI'});
 debugr.addText(text);
 
-loader.add(map);
+const l = new PIXI.loaders.Loader();
+l.use(TiledMapLoader());
 
-loader.onProgress.add(() => {
-	text.text = `Map: Loading ${map}... ${loader.progress}%`;
+
+const mapName = 'assets/island.tmx';
+l.add(mapName);
+
+l.onError.add((data) => {
+	text.text = `Error loading map`;
 });
 
-loader.onComplete.add(() => {
-	console.log(PIXI.loader);
-	text.text = `Map: ${map}`;
+l.onProgress.add(() => {
+	text.text = `Map: Loading ${mapName}... ${l.progress}%`;
 });
 
-loader.load(() => {
+l.onComplete.add(() => {
+	text.text = `Map: ${mapName}`;
+});
+
+
+console.log(l.resources);
+
+l.load(() => {
 	/**
 	 *   PIXI.extras.TiledMap() is an extended PIXI.Container()
 	 *   so you can render it right away
 	 */
-	const tileMap = new PIXI.extras.TiledMap(map);
+
+	const tileMap = new TileMap(mapName);
 	const viewport = new Viewport({
 		screenWidth: SCREEN_WIDTH,
 		screenHeight: SCREEN_HEIGHT,
-		worldWidth: tileMap._width * tileMap.tileWidth,
-		worldHeight: tileMap._height * tileMap.tileHeight,
-		interaction: app.renderer.interaction
+		worldWidth: tileMap.width * tileMap.tileWidth,
+		worldHeight: tileMap.height * tileMap.tileHeight,
+		interaction: app.renderer.plugins.interaction
 	});
 
 	viewport.parentGroup = mapLayer;
 	app.stage.addChild(viewport);
 	viewport.addChild(tileMap);
 
-	viewport.fit(true, tileMap._width * tileMap.tileWidth, tileMap._height * tileMap.tileHeight);
+	viewport.fit(true, tileMap.width * tileMap.tileWidth, tileMap.height * tileMap.tileHeight);
 
 	viewport
 		.drag()

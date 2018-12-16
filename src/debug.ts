@@ -13,7 +13,7 @@ export default class Debug extends PIXI.Container {
 	}
 
 	create() {
-		const style = { font: '16px SegoeUI' };
+		const style = { fontSize: 16, fontFamily: 'SegoeUI' };
 		let text = new PIXI.Text(`Debug`, style);
 		this.addText(text);
 		let fpsText = new PIXI.Text(`FPS:`, style);

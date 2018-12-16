@@ -15,4 +15,4 @@ Start the server
 $ npm start
 ```
 
-Let's code index.js!
+Let's code index.ts!
