@@ -1,5 +1,6 @@
 import * as tmx from 'tmx-parser';
 import * as path from "path";
+import {TileSetToTextureAtlas} from "./TileSetToTextureAtlas";
 
 export function TiledMapLoader() {
 	return function (resource, next) {
@@ -23,12 +24,15 @@ export function TiledMapLoader() {
 		tmx.parse(resource.xhr.responseText, route, (err, map) => {
 			if (err) throw err;
 
+			const atlases = TileSetToTextureAtlas(map, route);
+
 			// Load in tileset image sources
-			map.tileSets.forEach(tileset => {
-				if (!(tileset.image.source in this.resources)) {
-					this.add(tileset.image.source, `${route}/${tileset.image.source}`, loadOptions);
+			atlases.forEach(atlas => {
+				if (!(atlas.meta.image.source in this.resources)) {
+					this.add(atlas.meta.image, atlas.meta.image, loadOptions);
 				}
 			});
+			map.textureAtlas = atlases;
 
 			resource.data = map;
 			next();

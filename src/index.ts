@@ -33,7 +33,7 @@ window.addEventListener('resize', () => {
 
 
 app.stage.addChild(new PIXI.display.Layer(mapLayer));
-const debugr = new Debug();
+const debugr = new Debug(app);
 
 if (debug) {
 	app.stage.addChild(new PIXI.display.Layer(debugLayer));
@@ -44,7 +44,7 @@ if (debug) {
 const text = new PIXI.Text("", {fontSize: 16, fontFamily: 'SegoeUI'});
 debugr.addText(text);
 
-const l = new PIXI.loaders.Loader();
+const l = PIXI.loader;
 l.use(TiledMapLoader());
 
 

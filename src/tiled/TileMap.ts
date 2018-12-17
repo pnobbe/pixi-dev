@@ -17,14 +17,11 @@ export class TileMap extends PIXI.Container {
 	private _tileSets: Array<TileSet>;
 	private _layers: Array<AbstractLayer>;
 
-	private readonly resourceUrl: string;
-
-
 	constructor(resourceUrl) {
 		super();
-
+		console.log(PIXI.loader.resources);
 		const url = path.dirname(PIXI.loader.resources[resourceUrl].url);
-		const mapData = PIXI.loader.resources[this.resourceUrl].data;
+		const mapData = PIXI.loader.resources[resourceUrl].data;
 
 		const bg = new PIXI.Graphics();
 		bg.beginFill(this._backgroundColor, 0);

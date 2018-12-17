@@ -15,7 +15,6 @@ export class TileLayer extends AbstractLayer {
 
     constructor(props, tileSets) {
         super(props);
-
         this._map = props.map;
         this._tileCount = this._map.height * this._map.width;
 
@@ -25,36 +24,30 @@ export class TileLayer extends AbstractLayer {
         this._diagonalFlips = new Array(this.tileCount);
 
         this._tileSets = tileSets;
-        this.create();
+        this.create(props);
     }
 
-    create() {
+    create(props: any) {
         for (let y = 0; y < this.map.height; y++) {
             for (let x = 0; x < this.map.width; x++) {
                 let i = x + (y * this.map.width);
 
-                if (this.tiles[i]) {
+                if (props.tiles[i]) {
 
-                    if (this.tiles[i].id && this.tiles[i].id !== 0) {
+                    if (props.tiles[i].id && props.tiles[i].id !== 0) {
 
-                        let tileset = TileLayer.findTileset(this.tiles[i].id, this._tileSets);
-                        let tile = new Tile(this.tiles[i], tileset, this.horizontalFlips[i], this.verticalFlips[i], this.diagonalFlips[i]);
+                        let tileset = TileLayer.findTileset(props.tiles[i].id, this._tileSets);
+                        let tile = new Tile(props.tiles[i], tileset, this.horizontalFlips[i], this.verticalFlips[i], this.diagonalFlips[i]);
 
                         tile.x = x * this.map.tileWidth;
-                        tile.y = y * this.map.tileHeight + (this.map.tileHeight - tile.image.height);
+                        tile.y = y * this.map.tileHeight;
 
                         if (tileset.tileOffset) {
                             tile.x += tileset.tileOffset.x;
                             tile.y += tileset.tileOffset.y;
                         }
 
-                        if (tile.textures.length > 1) {
-                            tile.animationSpeed = 1000 / 60 / tile.animations[0].duration;
-                            tile.gotoAndPlay(0);
-                        }
-
                         this.tiles.push(tile);
-
                         this.addChild(tile);
                     }
                 }

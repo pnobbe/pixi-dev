@@ -7,21 +7,22 @@ export class Tile extends PIXI.extras.AnimatedSprite {
 	private readonly _terrain: Array<any>;
 	private readonly _probability: any;
 	private readonly _properties: any;
-	private readonly _animations: Array<any>;
 	private readonly _objectGroups: Array<any>;
 	private readonly _image: Image;
 
 	private readonly _hightlightFilter: OutlineFilter;
 
 	constructor(props, tileSet: TileSet, horizontalFlip, verticalFlip, diagonalFlip) {
-
+		// Before we construct derived superclass (AnimatedSprite), translate our animation textures to a proper PIXI.Texture array
+		let animationSpeed: number = 0;
 		let textures: Array<PIXI.Texture> = [];
 		if (props.animations.length) {
+			animationSpeed = 1000 / 60 / props.animations[0].duration;
 			props.animations.forEach(frame => {
-				textures.push(tileSet.textures[frame.tileId]);
+				textures.push(tileSet.getTextureById(frame.tileId));
 			});
 		} else {
-			textures.push(tileSet.textures[props.gid - tileSet.firstGid]);
+			textures.push(tileSet.getTextureByGid(props.gid));
 		}
 
 		super(textures);
@@ -30,9 +31,13 @@ export class Tile extends PIXI.extras.AnimatedSprite {
 		this._terrain = props.terrain;
 		this._probability = props.probability;
 		this._properties = props.properties;
-		this._animations = props.animations;
 		this._objectGroups = props.objectGroups;
-		this._image = new Image(props.image);
+		this._image = (props.image ? new Image(props.image) : null);
+
+		if (this.textures.length) {
+			this.animationSpeed = animationSpeed;
+			this.gotoAndPlay(0);
+		}
 
 		this._hightlightFilter = new OutlineFilter(2, 0x99ff99);
 
@@ -92,10 +97,6 @@ export class Tile extends PIXI.extras.AnimatedSprite {
 
 	get id(): number {
 		return this._id;
-	}
-
-	get animations(): Array<any> {
-		return this._animations;
 	}
 
 	get image(): Image {

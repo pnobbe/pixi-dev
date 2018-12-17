@@ -32,6 +32,14 @@ export class TileSet {
 		}
 	}
 
+	getTextureById(id: number): PIXI.Texture {
+		return this.textures[id];
+	}
+
+	getTextureByGid(gid: number): PIXI.Texture {
+		return this.textures[gid - this.firstGid];
+	}
+
 	get textures(): Array<PIXI.Texture> {
 		return this._textures;
 	}

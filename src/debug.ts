@@ -1,33 +1,39 @@
 import * as PIXI from "pixi.js";
+import {StatsJSAdapter} from "./gstats/StatJSAdapter";
+import {PIXIHooks} from "./gstats/PIXIHooks";
 
 export default class Debug extends PIXI.Container {
 
-	background;
-	constructor() {
+	private readonly background: PIXI.Sprite;
+	private readonly app: PIXI.Application;
+
+	constructor(app) {
 		super();
+		this.app = app;
+		const pixiHooks = new PIXIHooks(this.app);
+		const gstat = new StatsJSAdapter(pixiHooks);
+
+		document.body.appendChild(gstat._stats.dom || gstat._stats.domElement);
+		app.ticker.add(gstat.update);
+
 		this.background = new PIXI.Sprite(PIXI.Texture.WHITE);
 		this.background.alpha = 0.8;
+
 		this.addChild(this.background);
 
 		this.create();
 	}
 
 	create() {
-		const style = { fontSize: 16, fontFamily: 'SegoeUI' };
+		const style = {fontSize: 16, fontFamily: 'SegoeUI'};
 		let text = new PIXI.Text(`Debug`, style);
 		this.addText(text);
-		let fpsText = new PIXI.Text(`FPS:`, style);
-		this.addText(fpsText);
-
-		PIXI.ticker.shared.add(() => {
-			fpsText.text = `FPS: ${PIXI.ticker.shared.FPS}`;
-		});
 
 	}
 
 	resize() {
 		this.background.width = 250;
-		this.background.height = this.getBounds().height+5;
+		this.background.height = this.getBounds().height + 5;
 	}
 
 	addText(text) {
