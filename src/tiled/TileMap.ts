@@ -17,42 +17,42 @@ export class TileMap extends PIXI.Container {
 	private _tileSets: Array<TileSet>;
 	private _layers: Array<AbstractLayer>;
 
-	constructor(resourceUrl) {
+	constructor(resource) {
 		super();
-		console.log(PIXI.loader.resources);
-		const url = path.dirname(PIXI.loader.resources[resourceUrl].url);
-		const mapData = PIXI.loader.resources[resourceUrl].data;
+		const url = resource.url;
+		const map = resource.data;
 
 		const bg = new PIXI.Graphics();
-		bg.beginFill(this._backgroundColor, 0);
-		bg.drawRect(0, 0, mapData._width * mapData.tileWidth, mapData._height * mapData.tileHeight);
+		bg.beginFill(this.backgroundColor, 0);
+		bg.drawRect(0, 0, map.width * map.tileWidth, map.height * map.tileHeight);
 		bg.endFill();
 		this.addChild(bg);
 
+		debugger;
 		// Parse tilesets
 		this._tileSets = [];
-		mapData.tileSets.forEach(data => {
-			this._tileSets.push(new TileSet(url, data));
+		map.tileSets.forEach(data => {
+			this.tileSets.push(new TileSet(url, data));
 		});
 
 		// Parse layers
 		this._layers = [];
-		mapData.layers.forEach(layerData => {
+		map.layers.forEach(layerData => {
 			switch (layerData.type) {
 				case 'tile': {
-					let tileLayer = new TileLayer(layerData, this._tileSets);
-					this._layers[layerData.name] = tileLayer;
+					let tileLayer = new TileLayer(layerData, this.tileSets);
+					this.layers[layerData.name] = tileLayer;
 					this.addChild(tileLayer);
 					break;
 				}
 				case 'image': {
 					let imageLayer = new ImageLayer(layerData, url);
-					this._layers[layerData.name] = imageLayer;
+					this.layers[layerData.name] = imageLayer;
 					this.addChild(imageLayer);
 					break;
 				}
 				default: {
-					this._layers[layerData.name] = layerData;
+					this.layers[layerData.name] = layerData;
 				}
 			}
 		});
@@ -84,6 +84,14 @@ export class TileMap extends PIXI.Container {
 
 	get backgroundColor(): number {
 		return this._backgroundColor;
+	}
+
+	get tileSets(): Array<TileSet> {
+		return this._tileSets;
+	}
+
+	get layers(): Array<AbstractLayer> {
+		return this._layers;
 	}
 
 }

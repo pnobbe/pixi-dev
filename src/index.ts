@@ -66,13 +66,15 @@ l.onComplete.add(() => {
 
 console.log(l.resources);
 
-l.load(() => {
+l.load((loader, resources) => {
 	/**
 	 *   PIXI.extras.TiledMap() is an extended PIXI.Container()
 	 *   so you can render it right away
 	 */
 
-	const tileMap = new TileMap(mapName);
+	const tileMap = new TileMap(resources[mapName]);
+
+	debugger;
 	const viewport = new Viewport({
 		screenWidth: SCREEN_WIDTH,
 		screenHeight: SCREEN_HEIGHT,

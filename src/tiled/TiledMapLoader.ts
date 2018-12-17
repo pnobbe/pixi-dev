@@ -14,11 +14,6 @@ export function TiledMapLoader() {
 
 		// Set parser config
 		const route = path.dirname(resource.url.replace(this.baseUrl, ''));
-		const loadOptions = {
-			crossOrigin: resource.crossOrigin,
-			loadType: PIXI.loaders.Resource.LOAD_TYPE.IMAGE,
-			parentResource: resource
-		};
 
 		// Parse TMX file
 		tmx.parse(resource.xhr.responseText, route, (err, map) => {
@@ -26,16 +21,36 @@ export function TiledMapLoader() {
 
 			const atlases = TileSetToTextureAtlas(map, route);
 
+			if (!atlases.length) {
+				throw "No tilesets found";
+			}
+
+			const spritesheets = [];
+			const hasLoaded = [];
+			atlases.forEach(atlas => {
+				hasLoaded[atlas.meta.name] = false;
+			});
+
 			// Load in tileset image sources
 			atlases.forEach(atlas => {
-				if (!(atlas.meta.image.source in this.resources)) {
-					this.add(atlas.meta.image, atlas.meta.image, loadOptions);
-				}
-			});
-			map.textureAtlas = atlases;
+				const baseTexture = PIXI.BaseTexture.fromImage(atlas.meta.image, null, PIXI.SCALE_MODES.LINEAR);
+				const spritesheet = new PIXI.Spritesheet(baseTexture, atlas);
 
-			resource.data = map;
-			next();
+				spritesheet.parse(function (textures) {
+					spritesheets[atlas.meta.image] = spritesheet;
+					hasLoaded[atlas.meta.name] = true;
+					if (baseTexture.hasLoaded && hasLoaded.every(val => {
+						return val;
+					})) {
+						map.tileSets = spritesheets;
+						debugger;
+						resource.data = map;
+						next();
+					}
+				});
+			});
+
+
 		});
 
 	};

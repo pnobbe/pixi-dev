@@ -7,6 +7,7 @@ export function TileSetToTextureAtlas(map, route) {
 	const app = PIXI.autoDetectRenderer(500, 500);
 
 	tileSets.forEach(tileset => {
+		const name = tileset.name;
 		const mapWidth = tileset.image.width;
 		const mapHeight = tileset.image.height;
 		const tileHeight = tileset.tileHeight;
@@ -14,6 +15,7 @@ export function TileSetToTextureAtlas(map, route) {
 
 		const frames = {};
 		const meta = {
+			name: name,
 			app: "",
 			version: map.version,
 			image: path.join(route, tileset.image.source),
