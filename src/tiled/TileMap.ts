@@ -1,8 +1,7 @@
-import {TileSet} from './TileSet';
 import {TileLayer} from './TileLayer';
 import {ImageLayer} from './ImageLayer';
 import {AbstractLayer} from "./AbstractLayer";
-import * as path from "path";
+import {TileLayers} from "./TileLayers";
 
 export class TileMap extends PIXI.Container {
 
@@ -14,41 +13,31 @@ export class TileMap extends PIXI.Container {
 	private readonly _tileHeight: number;
 	private readonly _tileWidth: number;
 	private readonly _backgroundColor: any;
-	private _tileSets: Array<TileSet>;
-	private _layers: Array<AbstractLayer>;
+	private _tileSets: Array<PIXI.Spritesheet>;
+	private _layers: TileLayers;
 
 	constructor(resource) {
 		super();
 		const url = resource.url;
 		const map = resource.data;
-
 		const bg = new PIXI.Graphics();
 		bg.beginFill(this.backgroundColor, 0);
 		bg.drawRect(0, 0, map.width * map.tileWidth, map.height * map.tileHeight);
 		bg.endFill();
 		this.addChild(bg);
 
-		debugger;
-		// Parse tilesets
-		this._tileSets = [];
-		map.tileSets.forEach(data => {
-			this.tileSets.push(new TileSet(url, data));
-		});
-
 		// Parse layers
-		this._layers = [];
+		this._layers = new TileLayers();
 		map.layers.forEach(layerData => {
 			switch (layerData.type) {
 				case 'tile': {
-					let tileLayer = new TileLayer(layerData, this.tileSets);
-					this.layers[layerData.name] = tileLayer;
-					this.addChild(tileLayer);
+					let tileLayer = new TileLayer(layerData);
+					this.layers.addLayer(tileLayer);
 					break;
 				}
 				case 'image': {
 					let imageLayer = new ImageLayer(layerData, url);
-					this.layers[layerData.name] = imageLayer;
-					this.addChild(imageLayer);
+					this.layers.addLayer(imageLayer);
 					break;
 				}
 				default: {
@@ -56,6 +45,9 @@ export class TileMap extends PIXI.Container {
 				}
 			}
 		});
+
+		this.addChild(this.layers);
+
 	}
 
 	get version(): string {
@@ -86,11 +78,11 @@ export class TileMap extends PIXI.Container {
 		return this._backgroundColor;
 	}
 
-	get tileSets(): Array<TileSet> {
+	get tileSets(): Array<PIXI.Spritesheet> {
 		return this._tileSets;
 	}
 
-	get layers(): Array<AbstractLayer> {
+	get layers(): TileLayers {
 		return this._layers;
 	}
 

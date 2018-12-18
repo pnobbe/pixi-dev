@@ -3,7 +3,7 @@ import * as Viewport from 'pixi-viewport';
 import 'pixi-layers';
 import './tiled';
 import Debug from './debug';
-import {TiledMapLoader, TileMap} from "./tiled";
+import {TiledMapMiddleware, TileMap} from "./tiled";
 import './css/index.css';
 
 // import { GridLayer, MapLayer, TokenLayer, GMLayer } from './layers';
@@ -45,7 +45,7 @@ const text = new PIXI.Text("", {fontSize: 16, fontFamily: 'SegoeUI'});
 debugr.addText(text);
 
 const l = PIXI.loader;
-l.use(TiledMapLoader());
+l.use(TiledMapMiddleware());
 
 
 const mapName = 'assets/island.tmx';
@@ -74,7 +74,6 @@ l.load((loader, resources) => {
 
 	const tileMap = new TileMap(resources[mapName]);
 
-	debugger;
 	const viewport = new Viewport({
 		screenWidth: SCREEN_WIDTH,
 		screenHeight: SCREEN_HEIGHT,
@@ -93,6 +92,7 @@ l.load((loader, resources) => {
 		.drag()
 		.pinch()
 		.wheel()
-		.decelerate();
+		.decelerate()
+		.bounce();
 
 });
