@@ -1,6 +1,4 @@
 import * as PIXI from "pixi.js";
-import {StatsJSAdapter} from "./gstats/StatJSAdapter";
-import {PIXIHooks} from "./gstats/PIXIHooks";
 
 export default class Debug extends PIXI.Container {
 
@@ -10,11 +8,6 @@ export default class Debug extends PIXI.Container {
 	constructor(app) {
 		super();
 		this.app = app;
-		const pixiHooks = new PIXIHooks(this.app);
-		const gstat = new StatsJSAdapter(pixiHooks);
-
-		document.body.appendChild(gstat._stats.dom || gstat._stats.domElement);
-		app.ticker.add(gstat.update);
 
 		this.background = new PIXI.Sprite(PIXI.Texture.WHITE);
 		this.background.alpha = 0.8;

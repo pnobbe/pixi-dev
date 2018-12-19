@@ -21,7 +21,9 @@
 			"esnext"
 		]
 	},
-
+	"exclude": [
+		"./src/assets"
+	],
 	"include": [
 		"./src/"
 	]

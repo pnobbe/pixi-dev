@@ -3,8 +3,10 @@ import * as Viewport from 'pixi-viewport';
 import 'pixi-layers';
 import './tiled';
 import Debug from './debug';
-import {TiledMapMiddleware, TileMap} from "./tiled";
 import './css/index.css';
+import {TmxLoader} from "./loaders/TmxLoader";
+import {TileMap} from "./tiled/TileMap";
+import {TileMapMiddleware} from "./tiled/TileMapMiddleware";
 
 // import { GridLayer, MapLayer, TokenLayer, GMLayer } from './layers';
 
@@ -21,7 +23,6 @@ const mapLayer = new PIXI.display.Group(0, true);
 const debugLayer = new PIXI.display.Group(1, true);
 
 // Create pixi-display stage
-
 const displayStage = new PIXI.display.Stage();
 displayStage.group.enableSort = true;
 app.stage = displayStage;
@@ -30,6 +31,23 @@ app.stage = displayStage;
 window.addEventListener('resize', () => {
 	app.renderer.resize(window.innerWidth, window.innerHeight);
 });
+
+// Create viewport
+const viewport = new Viewport({
+	screenWidth: SCREEN_WIDTH,
+	screenHeight: SCREEN_HEIGHT,
+	interaction: app.renderer.plugins.interaction
+});
+
+viewport.parentGroup = mapLayer;
+app.stage.addChild(viewport);
+
+viewport
+	.drag()
+	.pinch()
+	.wheel()
+	.decelerate()
+	.bounce();
 
 
 app.stage.addChild(new PIXI.display.Layer(mapLayer));
@@ -44,55 +62,33 @@ if (debug) {
 const text = new PIXI.Text("", {fontSize: 16, fontFamily: 'SegoeUI'});
 debugr.addText(text);
 
-const l = PIXI.loader;
-l.use(TiledMapMiddleware());
-
-
+const loader = new TmxLoader();
 const mapName = 'assets/island.tmx';
-l.add(mapName);
 
-l.onError.add((data) => {
+loader.onError.add((data) => {
 	text.text = `Error loading map`;
 });
 
-l.onProgress.add(() => {
-	text.text = `Map: Loading ${mapName}... ${l.progress}%`;
+loader.onProgress.add(() => {
+	text.text = `Map: Loading ${mapName}... ${loader.progress}%`;
 });
 
-l.onComplete.add(() => {
+loader.onComplete.add(() => {
 	text.text = `Map: ${mapName}`;
 });
 
-
-console.log(l.resources);
-
-l.load((loader, resources) => {
+loader.add(mapName);
+loader.load((loader, resources) => {
 	/**
 	 *   PIXI.extras.TiledMap() is an extended PIXI.Container()
 	 *   so you can render it right away
 	 */
-
-	const tileMap = new TileMap(resources[mapName]);
-
-	const viewport = new Viewport({
-		screenWidth: SCREEN_WIDTH,
-		screenHeight: SCREEN_HEIGHT,
-		worldWidth: tileMap.width * tileMap.tileWidth,
-		worldHeight: tileMap.height * tileMap.tileHeight,
-		interaction: app.renderer.plugins.interaction
-	});
-
-	viewport.parentGroup = mapLayer;
-	app.stage.addChild(viewport);
+	let tileMap = new TileMap(resources[mapName]);
 	viewport.addChild(tileMap);
 
-	viewport.fit(true, tileMap.width * tileMap.tileWidth, tileMap.height * tileMap.tileHeight);
 
-	viewport
-		.drag()
-		.pinch()
-		.wheel()
-		.decelerate()
-		.bounce();
+
+	viewport.worldWidth = tileMap.width * tileMap.tileWidth;
+	viewport.worldHeight = tileMap.height * tileMap.tileHeight;
 
 });

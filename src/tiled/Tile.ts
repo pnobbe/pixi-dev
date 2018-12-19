@@ -3,20 +3,39 @@ import {OutlineFilter} from '@pixi/filter-outline';
 export class Tile extends PIXI.extras.AnimatedSprite {
 	private readonly _hightlightFilter: OutlineFilter;
 
-	constructor(textures, duration, horizontalFlip, verticalFlip, diagonalFlip) {
+	constructor(textures, durations, horizontalFlip, verticalFlip, diagonalFlip) {
+		// Instantiate AnimatedSprite with given texture(s)
 		super(textures);
-		if (this.textures.length && duration) {
-			this.animationSpeed = 1000 / 60 / duration;
+
+		// Check if there are multiple textures (implies animation)
+		if (textures.length > 1) {
+
+			// Check if the animation durations equal
+			// If they are equal we treat it as a single constant
+			if (!this.allEqual(durations)) {
+
+				// If they are not equal we want to change the animationSpeed on frame change.
+				this.onFrameChange = currentFrame => {
+					this.animationSpeed = 1000 / 60 / this._durations[currentFrame-1];
+				};
+				this._durations = durations;
+				debugger;
+			}
+
+			// Start the animation
+			this.animationSpeed = 1000 / 60 / durations[0];
 			this.gotoAndPlay(0);
 		}
 
+		// Init properties
 		this._hightlightFilter = new OutlineFilter(2, 0x99ff99);
+
+		this.interactive = true;
 
 		this.on('mouseover', this.onMouseOver)
 			.on('mouseout', this.onMouseOut)
 			.on('mouseup', this.onMouseUp);
 
-		this.interactive = true;
 		this.flip(horizontalFlip, verticalFlip, diagonalFlip);
 	}
 
@@ -64,5 +83,7 @@ export class Tile extends PIXI.extras.AnimatedSprite {
 			}
 		}
 	}
+
+	allEqual = arr => arr.every(v => v === arr[0]);
 
 }

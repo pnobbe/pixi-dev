@@ -6,16 +6,12 @@ export class ImageLayer extends AbstractLayer {
     private readonly _y: number;
     private readonly _image: Image;
 
-    constructor(props, url) {
+    constructor(props) {
         super(props);
 
         this._x = props.x;
         this._y = props.y;
         this._image = new Image(props.image);
-
-        if (this.image && this.image.source) {
-            this.addChild(PIXI.Sprite.fromImage(url + '/' + this.image.source));
-        }
     }
 
     get x(): number {

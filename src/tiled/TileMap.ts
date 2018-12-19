@@ -18,9 +18,14 @@ export class TileMap extends PIXI.Container {
 
 	constructor(resource) {
 		super();
-		const url = resource.url;
 		const map = resource.data;
 		const bg = new PIXI.Graphics();
+
+		this._tileHeight = map.tileHeight;
+		this._tileWidth = map.tileWidth;
+		this._width = map.width;
+		this._height = map.height;
+
 		bg.beginFill(this.backgroundColor, 0);
 		bg.drawRect(0, 0, map.width * map.tileWidth, map.height * map.tileHeight);
 		bg.endFill();
@@ -36,12 +41,16 @@ export class TileMap extends PIXI.Container {
 					break;
 				}
 				case 'image': {
-					let imageLayer = new ImageLayer(layerData, url);
+					let imageLayer = new ImageLayer(layerData);
 					this.layers.addLayer(imageLayer);
 					break;
 				}
-				default: {
+				case 'object': {
 					this.layers[layerData.name] = layerData;
+					break;
+				}
+				default: {
+					break;
 				}
 			}
 		});
