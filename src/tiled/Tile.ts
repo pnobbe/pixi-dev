@@ -1,7 +1,7 @@
-import {OutlineFilter} from '@pixi/filter-outline';
+import {GlowFilter} from '@pixi/filter-glow';
 
 export class Tile extends PIXI.extras.AnimatedSprite {
-	private readonly _hightlightFilter: OutlineFilter;
+	private readonly _hightlightFilter: GlowFilter;
 
 	constructor(textures, durations, horizontalFlip, verticalFlip, diagonalFlip) {
 		// Instantiate AnimatedSprite with given texture(s)
@@ -16,10 +16,9 @@ export class Tile extends PIXI.extras.AnimatedSprite {
 
 				// If they are not equal we want to change the animationSpeed on frame change.
 				this.onFrameChange = currentFrame => {
-					this.animationSpeed = 1000 / 60 / this._durations[currentFrame-1];
+					// this.animationSpeed = 1000 / 60 / this._durations[currentFrame-1];
 				};
-				this._durations = durations;
-				debugger;
+				// this._durations = durations;
 			}
 
 			// Start the animation
@@ -28,7 +27,7 @@ export class Tile extends PIXI.extras.AnimatedSprite {
 		}
 
 		// Init properties
-		this._hightlightFilter = new OutlineFilter(2, 0x99ff99);
+		this._hightlightFilter = new GlowFilter(10, 4, 0, 0x99ff99, 0.1);
 
 		this.interactive = true;
 
@@ -41,12 +40,12 @@ export class Tile extends PIXI.extras.AnimatedSprite {
 
 	onMouseOver() {
 		this.alpha = 0.8;
-		this.filters = [this._hightlightFilter];
+		this.filters.push(this._hightlightFilter);
 	}
 
 	onMouseOut() {
 		this.alpha = 1;
-		this.filters = [];
+		this.filters = this.filters.filter((e => e !== this._hightlightFilter));
 	}
 
 	onMouseUp() {

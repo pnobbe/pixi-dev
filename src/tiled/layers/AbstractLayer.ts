@@ -1,9 +1,4 @@
 export abstract class AbstractLayer extends PIXI.Container {
-
-	private readonly _type: string;
-	private readonly _name: string;
-	private readonly _properties: any;
-
 	protected constructor(props) {
 		super();
 		this._type = props.type;
@@ -11,8 +6,11 @@ export abstract class AbstractLayer extends PIXI.Container {
 		this._properties = props.properties;
 		this.visible = props.visible;
 		this.alpha = props.opacity;
-
 	}
+
+	private readonly _type: string;
+	private readonly _name: string;
+	private readonly _properties: any;
 
 	get type(): string {
 		return this._type;

@@ -1,4 +1,4 @@
-import {Image} from "./Image";
+import {Image} from "../Image";
 import {AbstractLayer} from "./AbstractLayer";
 
 export class ImageLayer extends AbstractLayer {

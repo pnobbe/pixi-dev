@@ -1,30 +1,31 @@
-import {Tile} from './Tile';
+import {Tile} from '../Tile';
 import {AbstractLayer} from "./AbstractLayer";
 
 export class TileLayer extends AbstractLayer {
-
-	private readonly _tiles: Array<Tile>;
-	private readonly _tileCount;
-
 	constructor(props) {
 		super(props);
 		this._tileCount = props.map.height * props.map.width;
 		this._tiles = new Array(this.tileCount);
 
-		this.create(props);
+		this.initialize(props);
 	}
 
-	create(props: any) {
-		for (let y = 0; y < props.map.height; y++) {
-			for (let x = 0; x < props.map.width; x++) {
-				let i = x + (y * props.map.width);
+	private readonly _tiles: Array<Tile>;
+	private readonly _tileCount;
+	private textures: Array<PIXI.Texture>;
 
-				if (props.tiles[i]) {
-					const tileData = props.tiles[i];
+	initialize(props) {
+		const { map, tiles, horizontalFlips, verticalFlips, diagonalFlips} = props;
+		for (let y = 0; y < map.height; y++) {
+			for (let x = 0; x < map.width; x++) {
+				let i = x + (y * map.width);
+
+				if (tiles[i]) {
+					const tileData = tiles[i];
 					if (tileData.id) {
 						const textures = [];
 						const durations = [];
-						const spritesheet = TileLayer.findSpritesheet(tileData.gid, props.map.spritesheets);
+						const spritesheet = TileLayer.findSpritesheet(tileData.gid, map.spritesheets);
 						if (tileData.animations.length) {
 							tileData.animations.forEach(anim => {
 								textures.push(spritesheet.textures[anim.tileId]);
@@ -33,9 +34,9 @@ export class TileLayer extends AbstractLayer {
 						} else {
 							textures.push(spritesheet.textures[tileData.id]);
 						}
-						let tile = new Tile(textures, durations, props.horizontalFlips[i], props.verticalFlips[i], props.diagonalFlips[i]);
-						tile.x = x * props.map.tileWidth;
-						tile.y = y * props.map.tileHeight;
+						let tile = new Tile(textures, durations, horizontalFlips[i], verticalFlips[i] ,diagonalFlips[i]);
+						tile.x = x * map.tileWidth;
+						tile.y = y * map.tileHeight;
 
 						// if (tileset.tileOffset) {
 						//     tile.x += tileset.tileOffset.x;
