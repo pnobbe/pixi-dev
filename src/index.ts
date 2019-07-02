@@ -1,12 +1,10 @@
-import * as PIXI from 'pixi.js';
-import { Viewport } from 'pixi-viewport';
-import { Stage, Layer} from 'pixi-layers';
+import { Container, Text, Application }  from 'pixi.js';
+// import { Viewport } from 'pixi-viewport';
 import './tiled';
 import Debug from './debug';
 import './css/index.css';
 import {TmxLoader} from "./loaders/TmxLoader";
 import {TileMap} from "./tiled/TileMap";
-import {TileMapMiddleware} from "./tiled/TileMapMiddleware";
 
 // import { GridLayer, MapLayer, TokenLayer, GMLayer } from './layers';
 
@@ -15,7 +13,7 @@ const debug = true;
 const SCREEN_WIDTH = window.innerWidth;
 const SCREEN_HEIGHT = window.innerHeight;
 
-let app = new PIXI.Application({
+let app = new Application({
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
     backgroundColor: 0x34034
@@ -23,47 +21,49 @@ let app = new PIXI.Application({
 
 document.body.appendChild(app.view);
 
-// Create groups
-const mapLayer = new PIXI.display.Group(0, true);
-const debugLayer = new PIXI.display.Group(1, true);
+// Create stage
+app.stage = new Container();
+app.stage.sortableChildren = true;
 
-// Create pixi-display stage
-const displayStage = new Stage();
-displayStage.group.enableSort = true;
-app.stage = displayStage;
+// Create groups
+const mapLayer = new Container();
+const debugLayer = new Container();
+
+// Set zIndex for layer sorting
+mapLayer.zIndex = 0;
+debugLayer.zIndex = 1;
 
 // Resize renderer together with window
 window.addEventListener('resize', () => {
     app.renderer.resize(window.innerWidth, window.innerHeight);
 });
 
-// Create viewport
-const viewport = new Viewport({
-    screenWidth: SCREEN_WIDTH,
-    screenHeight: SCREEN_HEIGHT,
-    interaction: app.renderer.plugins.interaction
-});
+// // Create viewport
+// const viewport = new Viewport({
+//     screenWidth: SCREEN_WIDTH,
+//     screenHeight: SCREEN_HEIGHT,
+//     interaction: app.renderer.plugins.interaction
+// });
 
-viewport.parentGroup = mapLayer;
-app.stage.addChild(viewport);
+// viewport.parentGroup = mapLayer;
+// app.stage.addChild(viewport);
+//
+// viewport
+//     .drag()
+//     .pinch()
+//     .wheel()
+//     .decelerate()
+//     .bounce();
 
-viewport
-    .drag()
-    .pinch()
-    .wheel()
-    .decelerate()
-    .bounce();
-
-app.stage.addChild(new Layer(mapLayer));
+app.stage.addChild(mapLayer);
 const debugr = new Debug(app);
 
 if (debug) {
-    app.stage.addChild(new Layer(debugLayer));
-    debugr.parentGroup = debugLayer;
-    app.stage.addChild(debugr);
+    app.stage.addChild(debugLayer);
+    debugLayer.addChild(debugr);
 }
 
-const text = new PIXI.Text("", {fontSize: 16, fontFamily: 'SegoeUI'});
+const text = new Text("", {fontSize: 16, fontFamily: 'SegoeUI'});
 debugr.addText(text);
 
 const loader = new TmxLoader();
@@ -76,14 +76,15 @@ loader.onComplete.add(() => text.text = `Map: ${mapName}`);
 loader.add(mapName);
 loader.load((loader, resources) => {
     /**
-     *   PIXI.extras.TiledMap() is an extended PIXI.Container()
+     *   TiledMap() is an extended Container()
      *   so you can render it right away
      */
     let tileMap = new TileMap(resources[mapName]);
-    viewport.addChild(tileMap);
-
-
-    viewport.worldWidth = tileMap.width * tileMap.tileWidth;
-    viewport.worldHeight = tileMap.height * tileMap.tileHeight;
+    app.stage.addChild(tileMap);
+    // viewport.addChild(tileMap);
+    //
+    //
+    // viewport.worldWidth = tileMap.width * tileMap.tileWidth;
+    // viewport.worldHeight = tileMap.height * tileMap.tileHeight;
 
 });

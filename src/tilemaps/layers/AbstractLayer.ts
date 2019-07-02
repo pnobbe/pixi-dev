@@ -1,4 +1,6 @@
-export abstract class AbstractLayer extends PIXI.Container {
+import { Container } from 'pixi.js';
+
+export abstract class AbstractLayer extends Container {
 	protected constructor(props) {
 		super();
 		this._type = props.type;

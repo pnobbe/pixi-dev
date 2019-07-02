@@ -1,6 +1,7 @@
 import * as tmx from 'tmx-parser';
 import * as path from "path";
 import {TilesetToSpritesheet} from "./TilesetToSpritesheet";
+import { Spritesheet, LoaderResource } from 'pixi.js';
 
 export function TileMapMiddleware() {
 	return function (resource, next) {
@@ -8,7 +9,7 @@ export function TileMapMiddleware() {
 		// Check if data is valid & not empty
 		if (!resource.data ||
 			!(resource.extension === 'tmx') ||
-			resource.type !== PIXI.loaders.Resource.TYPE.XML ||
+			resource.type !== LoaderResource.TYPE.XML ||
 			!resource.data.children[0].getElementsByTagName('tileset')) {
 			return next();
 		}
@@ -28,7 +29,7 @@ export function TileMapMiddleware() {
 				const loaded = [];
 				map.tileSets.forEach(tileset => {
 					loaded[tileset.firstGid] = false;
-					TilesetToSpritesheet(tileset, route, loadOptions, (err, spritesheet: PIXI.Spritesheet) => {
+					TilesetToSpritesheet(tileset, route, loadOptions, (err, spritesheet: Spritesheet) => {
 						spritesheets[spritesheet.data.meta.name] = spritesheet;
 						loaded[spritesheet.data.meta.name] = true;
 

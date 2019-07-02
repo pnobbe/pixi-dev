@@ -1,7 +1,8 @@
-import {GlowFilter} from '@pixi/filter-glow';
+import { DotFilter } from 'pixi-filters';
+import { AnimatedSprite, DEG_TO_RAD, RAD_TO_DEG } from 'pixi.js';
 
-export class Tile extends PIXI.extras.AnimatedSprite {
-	private readonly _hightlightFilter: GlowFilter;
+export class Tile extends AnimatedSprite {
+	private readonly _hightlightFilter: DotFilter;
 
 	constructor(textures, durations, horizontalFlip, verticalFlip, diagonalFlip) {
 		// Instantiate AnimatedSprite with given texture(s)
@@ -27,7 +28,9 @@ export class Tile extends PIXI.extras.AnimatedSprite {
 		}
 
 		// Init properties
-		this._hightlightFilter = new GlowFilter(10, 4, 0, 0x99ff99, 0.1);
+		this._hightlightFilter = new DotFilter();
+
+		this.filters = [];
 
 		this.interactive = true;
 
@@ -40,12 +43,12 @@ export class Tile extends PIXI.extras.AnimatedSprite {
 
 	onMouseOver() {
 		this.alpha = 0.8;
-		this.filters.push(this._hightlightFilter);
+		this.filters = [this._hightlightFilter];
 	}
 
 	onMouseOut() {
 		this.alpha = 1;
-		this.filters = this.filters.filter((e => e !== this._hightlightFilter));
+		this.filters = [];
 	}
 
 	onMouseUp() {
@@ -70,7 +73,7 @@ export class Tile extends PIXI.extras.AnimatedSprite {
 				this.anchor.y = 1;
 				this.scale.y = 1;
 
-				this.rotation = PIXI.DEG_TO_RAD * 90;
+				this.rotation = DEG_TO_RAD * 90;
 			}
 			if (vFlip) {
 				this.anchor.x = 1;
@@ -78,7 +81,7 @@ export class Tile extends PIXI.extras.AnimatedSprite {
 				this.anchor.y = 0;
 				this.scale.y = 1;
 
-				this.rotation = PIXI.DEG_TO_RAD * -90;
+				this.rotation = DEG_TO_RAD * -90;
 			}
 		}
 	}

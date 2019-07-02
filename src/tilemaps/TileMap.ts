@@ -1,8 +1,10 @@
+import { Container, Spritesheet } from 'pixi.js';
 import {TileLayer} from './layers/TileLayer';
 import {ImageLayer} from './layers/ImageLayer';
 import {AbstractLayer} from "./layers/AbstractLayer";
+import { Graphics } from 'pixi.js';
 
-export class TileMap extends PIXI.Container {
+export class TileMap extends Container {
 
     // TMX properties
     private readonly _version: string;
@@ -12,12 +14,12 @@ export class TileMap extends PIXI.Container {
     private readonly _tileHeight: number;
     private readonly _tileWidth: number;
     private readonly _backgroundColor: any;
-    private _tileSets: Array<PIXI.Spritesheet>;
+    private _tileSets: Array<Spritesheet>;
 
     constructor(resource) {
         super();
         const map = resource.data;
-        const bg = new PIXI.Graphics();
+        const bg = new Graphics();
 
         this._tileHeight = map.tileHeight;
         this._tileWidth = map.tileWidth;

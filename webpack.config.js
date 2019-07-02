@@ -57,11 +57,15 @@ module.exports = ({ mode, presets } = { mode: 'production', presets: [] }) => {
 							name: '[path][name].[ext]',
 						}
 					}]
+				},
+				{
+					test: /\.(frag|vert)$/,
+					use: 'raw-loader'
 				}
 			]
 		},
 		resolve: {
-			extensions: ['.ts', '.js'],
+			extensions: ['.ts', '.js', '.frag', '.vert'],
 			plugins: [
 				new TsconfigPathsPlugin({
 					configFile: "./tsconfig.json"
